@@ -119,7 +119,7 @@ class Project:
 
         # Ensure that the project id is configured.
         try:
-            self._id = str(self.config["project"])
+            self.id_ = str(self.config["project"])
         except KeyError:
             raise LookupError(
                 "Unable to determine project id. "
@@ -261,7 +261,7 @@ class Project:
             The project id.
 
         """
-        return self._id
+        return self.id_
 
     def _check_schema_compatibility(self):
         """Check whether this project's data schema is compatible with this version.
@@ -310,11 +310,11 @@ class Project:
         tmp = set()
         for i in range(JOB_ID_LENGTH):
             tmp.clear()
-            for _id in job_ids:
-                if _id[:i] in tmp:
+            for id_ in job_ids:
+                if id_[:i] in tmp:
                     break
                 else:
-                    tmp.add(_id[:i])
+                    tmp.add(id_[:i])
             else:
                 break
         return i
@@ -534,7 +534,7 @@ class Project:
             return self.Job(project=self, statepoint=statepoint)
         try:
             # Optimal case (id is in the state point cache)
-            return self.Job(project=self, statepoint=self._sp_cache[id], _id=id)
+            return self.Job(project=self, statepoint=self._sp_cache[id], id_=id)
         except KeyError:
             # Worst case: no state point was provided and the state point cache
             # missed. The Job will register itself in self._sp_cache when the
@@ -542,7 +542,7 @@ class Project:
             if len(id) < JOB_ID_LENGTH:
                 # Resolve partial job ids (first few characters) into a full job id
                 job_ids = self._find_job_ids()
-                matches = [_id for _id in job_ids if _id.startswith(id)]
+                matches = [id_ for id_ in job_ids if id_.startswith(id)]
                 if len(matches) == 1:
                     id = matches[0]
                 elif len(matches) > 1:
@@ -553,7 +553,7 @@ class Project:
             elif not self._contains_job_id(id):
                 # id does not exist in the project data space
                 raise KeyError(id)
-            return self.Job(project=self, _id=id)
+            return self.Job(project=self, id_=id)
 
     def _job_dirs(self):
         """Generate ids of jobs in the workspace.
@@ -669,7 +669,7 @@ class Project:
         index = self._build_index(include_job_document=False)
         if subset is not None:
             subset = {str(s) for s in subset}
-            index = [doc for doc in index if doc["_id"] in subset]
+            index = [doc for doc in index if doc["id_"] in subset]
         statepoint_index = _build_job_statepoint_index(
             exclude_const=exclude_const, index=index
         )
@@ -830,18 +830,18 @@ class Project:
         """
         return self.find_jobs().to_dataframe(*args, **kwargs)
 
-    def _register(self, _id, statepoint):
+    def _register(self, id_, statepoint):
         """Register the job state point in the project state point cache.
 
         Parameters
         ----------
-        _id : str
+        id_ : str
             A job identifier.
         statepoint : dict
             A validated job state point.
 
         """
-        self._sp_cache[_id] = statepoint
+        self._sp_cache[id_] = statepoint
 
     def _get_statepoint_from_workspace(self, job_id):
         """Attempt to read the state point from the workspace.
@@ -1336,13 +1336,13 @@ class Project:
         Yields
         ------
         dict
-            Dictionary with keys ``_id`` containing the job id, ``sp``
+            Dictionary with keys ``id_`` containing the job id, ``sp``
             containing the state point, and ``doc`` containing the job document
             if requested.
 
         """
         for job_id in self._find_job_ids():
-            doc = dict(_id=job_id, sp=self._get_statepoint(job_id))
+            doc = dict(id_=job_id, sp=self._get_statepoint(job_id))
             if include_job_document:
                 try:
                     # Performance-critical path. We can rely on the project
@@ -1368,11 +1368,11 @@ class Project:
         to_add = job_ids.difference(cached_ids)
         to_remove = cached_ids.difference(job_ids)
         if to_add or to_remove:
-            for _id in to_remove:
-                del self._sp_cache[_id]
+            for id_ in to_remove:
+                del self._sp_cache[id_]
 
-            def _add(_id):
-                self._sp_cache[_id] = self._get_statepoint_from_workspace(_id)
+            def _add(id_):
+                self._sp_cache[id_] = self._get_statepoint_from_workspace(id_)
 
             to_add_chunks = _split_and_print_progress(
                 iterable=list(to_add),

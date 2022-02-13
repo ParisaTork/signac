@@ -678,7 +678,7 @@ class TestProject(TestProjectBase):
             self.project.open_job(sp).document["test"] = True
         job_ids = {job.id for job in self.project.find_jobs()}
         docs = list(self.project._build_index())
-        job_ids_cmp = {doc["_id"] for doc in docs}
+        job_ids_cmp = {doc["id_"] for doc in docs}
         assert job_ids == job_ids_cmp
         assert len(docs) == len(statepoints)
 
@@ -2418,7 +2418,7 @@ class TestProjectInit:
         job_a.init()
         job_b = project_b.open_job({"b": 1})
         job_b.init()
-        symlink_path = os.path.join(project_b.workspace(), job_a._id)
+        symlink_path = os.path.join(project_b.workspace(), job_a.id_)
         os.symlink(job_a.ws, symlink_path)
         assert project_a.get_job(symlink_path) == job_a
         assert project_b.get_job(symlink_path) == job_a
