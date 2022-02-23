@@ -85,13 +85,6 @@ class TestProject(TestProjectBase):
     def test_get(self):
         pass
 
-<<<<<<< HEAD
-    def test_property_id(self):
-        assert self.project.id == "testing_test_project"
-        assert str(self.project) == self.project.id
-
-=======
->>>>>>> upstream/next
     def test_repr(self):
         repr(self.project)
         p = eval(repr(self.project))
@@ -120,10 +113,6 @@ class TestProject(TestProjectBase):
             with TemporaryDirectory() as tmp_dir:
                 os.environ["SIGNAC_ENV_DIR_TEST"] = os.path.join(tmp_dir, "work_here")
                 project = self.project_class.init_project(
-<<<<<<< HEAD
-                    name="testing_test_project",
-=======
->>>>>>> upstream/next
                     root=tmp_dir,
                     workspace="${SIGNAC_ENV_DIR_TEST}",
                 )
@@ -228,24 +217,12 @@ class TestProject(TestProjectBase):
 
         with TemporaryDirectory() as tmp_dir:
             abs_path = os.path.join(tmp_dir, "path", "to", "workspace")
-<<<<<<< HEAD
-            project = self.project_class.init_project(
-                name="testing_test_project", root=tmp_dir, workspace=abs_path
-            )
-=======
             project = self.project_class.init_project(root=tmp_dir, workspace=abs_path)
->>>>>>> upstream/next
             assert project.workspace() == norm_path(abs_path)
 
         with TemporaryDirectory() as tmp_dir:
             rel_path = norm_path(os.path.join("path", "to", "workspace"))
-<<<<<<< HEAD
-            project = self.project_class.init_project(
-                name="testing_test_project", root=tmp_dir, workspace=rel_path
-            )
-=======
             project = self.project_class.init_project(root=tmp_dir, workspace=rel_path)
->>>>>>> upstream/next
             assert project.workspace() == norm_path(
                 os.path.join(project.root_directory(), rel_path)
             )
@@ -265,11 +242,7 @@ class TestProject(TestProjectBase):
     def test_workspace_broken_link_error_on_find(self):
         with TemporaryDirectory() as tmp_dir:
             project = self.project_class.init_project(
-<<<<<<< HEAD
-                name="testing_test_project", root=tmp_dir, workspace="workspace-link"
-=======
                 root=tmp_dir, workspace="workspace-link"
->>>>>>> upstream/next
             )
             os.rmdir(os.path.join(tmp_dir, "workspace-link"))
             os.symlink(
@@ -695,11 +668,7 @@ class TestProject(TestProjectBase):
             self.project.open_job(sp).document["test"] = True
         job_ids = {job.id for job in self.project.find_jobs()}
         docs = list(self.project._build_index())
-<<<<<<< HEAD
         job_ids_cmp = {doc["_id"] for doc in docs}
-=======
-        job_ids_cmp = {doc["_id"] for doc in docs}
->>>>>>> upstream/next
         assert job_ids == job_ids_cmp
         assert len(docs) == len(statepoints)
 
@@ -1071,8 +1040,6 @@ class TestProject(TestProjectBase):
             assert len(tmp_project) == 10
         assert not os.path.isdir(tmp_root_dir)
 
-<<<<<<< HEAD
-=======
 
 # Use the major version to fail tests expected to fail in 3.0.
 _MAJOR_VERSION = version.parse(signac.__version__)
@@ -1129,7 +1096,6 @@ class TestProjectNameDeprecations:
         with pytest.raises(TypeError, match="got an unexpected keyword argument 'foo'"):
             signac.init_project(name="project", foo="bar")
 
->>>>>>> upstream/next
 
 class TestProjectExportImport(TestProjectBase):
     def test_export(self):
@@ -2319,30 +2285,12 @@ class TestProjectInit:
         assert project.root_directory() == root
 
     def test_project_no_id(self):
-<<<<<<< HEAD
-        root = self._tmp_dir.name
-        signac.init_project(name="testproject", root=root)
-        config = load_config(root)
-        del config["project"]
-        with pytest.raises(LookupError):
-            Project(config=config)
-
-    def test_get_project_all_printable_characters(self):
-=======
->>>>>>> upstream/next
         root = self._tmp_dir.name
         signac.init_project(root=root)
         config = load_config(root)
         del config["project"]
         with pytest.raises(LookupError):
-<<<<<<< HEAD
-            signac.get_project(root=root)
-        project_name = "testproject" + string.printable
-        project = signac.init_project(name=project_name, root=root)
-        assert project.id == project_name
-=======
             Project(config=config)
->>>>>>> upstream/next
 
     def test_get_project_non_local(self):
         root = self._tmp_dir.name
