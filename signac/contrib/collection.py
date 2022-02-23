@@ -335,7 +335,7 @@ class _CollectionSearchResults:
         self._ids = _ids
 
     def __iter__(self):
-        return (self._collection[id_] for id_ in self._ids)
+        return (self._collection[_id] for _id in self._ids)
 
     def __len__(self):
         return len(self._ids)
@@ -404,7 +404,7 @@ class Collection:
         index of the collection. Selecting documents by primary key has
         time complexity of O(N) in the worst case and O(1) on average.
         All documents must have a primary key value. The default primary
-        key is `id_`.
+        key is `_id`.
     compresslevel : int
         The level of compression to use. Any positive value
         implies compression and is used by the underlying gzip implementation.
@@ -451,7 +451,7 @@ class Collection:
 
         Returns
         -------
-        id_ : str
+        _id : str
             Next default id.
 
         Raises
@@ -466,24 +466,24 @@ class Collection:
             assert self._next_default_id_ < MAX_DEFAULT_ID
             _id = str(hex(self._next_default_id_))[2:].rjust(ID_LENGTH, "0")
             self._next_default_id_ += 1
-            if id_ not in self:
-                return id_
+            if _id not in self:
+                return _id
         raise RuntimeError("Unable to determine default id.")
 
-    def _remove_from_indexes(self, id_):
+    def _remove_from_indexes(self, _id):
         """Remove index corresponding to given id.
 
         Parameters
         ----------
-        id_ : str
+        _id : str
             id to remove from the index.
 
         """
         for index in self._indexes.values():
             remove_keys = set()
             for key, group in index.items():
-                if id_ in group:  # faster than exception handling (performance)
-                    group.remove(id_)
+                if _id in group:  # faster than exception handling (performance)
+                    group.remove(_id)
                 if not len(group):
                     remove_keys.add(key)
             for key in remove_keys:
@@ -492,9 +492,9 @@ class Collection:
     def _update_indexes(self):
         """Update the indexes."""
         if self._dirty:
-            for id_ in self._dirty:
-                self._remove_from_indexes(id_)
-            docs = [self[id_] for id_ in self._dirty]
+            for _id in self._dirty:
+                self._remove_from_indexes(_id)
+            docs = [self[_id] for _id in self._dirty]
             for key, index in self._indexes.items():
                 tmp = _build_index(docs, key, self._primary_key)
                 for v, group in tmp.items():
@@ -523,8 +523,8 @@ class Collection:
         .. code-block:: python
 
             age_index = member_collection.index('age')
-            for id_ in age_index[32]:
-                print(member_collection[id_]['name'])
+            for _id in age_index[32]:
+                print(member_collection[_id]['name'])
 
         This means we can access documents by the 'age' key in O(1) time on
         average in addition to the primary key. Using the :meth:`.find`
@@ -596,22 +596,22 @@ class Collection:
 
     @property
     def primary_key(self):
-        """Get the name of the collection's primary key (default='id_')."""
+        """Get the name of the collection's primary key (default='_id')."""
         return self._primary_key
 
     def __len__(self):
         self._assert_open()
         return len(self._docs)
 
-    def __contains__(self, id_):
-        return id_ in self._docs
+    def __contains__(self, _id):
+        return _id in self._docs
 
-    def __getitem__(self, id_):
+    def __getitem__(self, _id):
         # The _assert_open() check is only performed after an
         # exception has been caught, which is slightly faster
         # than running the check every time.
         try:
-            return self._docs[id_].copy()
+            return self._docs[_id].copy()
         except TypeError:
             self._assert_open()
             raise
@@ -664,15 +664,15 @@ class Collection:
             return
         return doc
 
-    def __setitem__(self, id_, doc, _trust=False):
+    def __setitem__(self, _id, doc, _trust=False):
         self._assert_open()
-        if not isinstance(id_, str):
+        if not isinstance(_id, str):
             raise TypeError("The primary key must be of type str!")
-        doc.setdefault(self._primary_key, id_)
-        if id_ != doc[self._primary_key]:
+        doc.setdefault(self._primary_key, _id)
+        if _id != doc[self._primary_key]:
             raise ValueError("Primary key mismatch!")
         if _trust:
-            self._docs[id_] = doc
+            self._docs[_id] = doc
         else:
             try:
                 doc_ = json.loads(json.dumps(doc))
@@ -680,8 +680,8 @@ class Collection:
                 raise TypeError(
                     f"Serialization of document '{doc}' failed with error: {error}"
                 )
-            self._docs[id_] = self._validate_doc(doc_)
-        self._dirty.add(id_)
+            self._docs[_id] = self._validate_doc(doc_)
+        self._dirty.add(_id)
         self._requires_flush = True
 
     def insert_one(self, doc):
@@ -692,8 +692,8 @@ class Collection:
 
         .. code-block:: python
 
-            id_ = collection.insert_one(doc)
-            assert id_ in collection
+            _id = collection.insert_one(doc)
+            assert _id in collection
 
         .. note::
 
@@ -708,25 +708,25 @@ class Collection:
         Returns
         -------
         str
-            The id_ of the inserted documented.
+            The _id of the inserted documented.
 
         """
         self._assert_open()
         if self._primary_key in doc:
-            id_ = doc[self._primary_key]
+            _id = doc[self._primary_key]
         else:
-            id_ = doc[self._primary_key] = self._next_default_id()
-        if id_ in self:
+            _id = doc[self._primary_key] = self._next_default_id()
+        if _id in self:
             raise KeyError("Primary key collision!")
-        self[id_] = doc
-        return id_
+        self[_id] = doc
+        return _id
 
-    def __delitem__(self, id_):
+    def __delitem__(self, _id):
         self._assert_open()
-        del self._docs[id_]
-        self._remove_from_indexes(id_)
+        del self._docs[_id]
+        self._remove_from_indexes(_id)
         try:
-            self._dirty.remove(id_)
+            self._dirty.remove(_id)
         except KeyError:
             pass
         self._requires_flush = True
@@ -752,10 +752,10 @@ class Collection:
         """
         for doc in docs:
             if self._primary_key in doc:
-                id_ = doc[self._primary_key]
+                _id = doc[self._primary_key]
             else:
-                id_ = doc[self._primary_key] = self._next_default_id()
-            self[id_] = doc
+                _id = doc[self._primary_key] = self._next_default_id()
+            self[_id] = doc
 
     def _find_expression(self, key, value):
         """Find document for key value pair.
@@ -858,9 +858,9 @@ class Collection:
 
         # Check if filter contains primary key, in which case we can
         # immediately reduce the result.
-        id_ = expr.pop(self._primary_key, None)
-        if id_ is not None:
-            reduce_results({id_} if id_ in self else set())
+        _id = expr.pop(self._primary_key, None)
+        if _id is not None:
+            reduce_results({_id} if _id in self else set())
 
         # Extract all logical-operator expressions for now.
         or_expressions = expr.pop("$or", None)
@@ -1129,14 +1129,14 @@ class Collection:
         """
         self._assert_open()
         if len(filter) == 1 and self._primary_key in filter:
-            id_ = filter[self._primary_key]
-            if upsert or id_ in self:
-                self[id_] = replacement
-                return id_
+            _id = filter[self._primary_key]
+            if upsert or _id in self:
+                self[_id] = replacement
+                return _id
         else:
-            for id_ in self._find(filter):
-                self[id_] = replacement
-                return id_
+            for _id in self._find(filter):
+                self[_id] = replacement
+                return _id
             else:
                 if upsert:
                     return self.insert_one(replacement)
@@ -1151,8 +1151,8 @@ class Collection:
 
         """
         to_delete = set(self._find(filter))
-        for id_ in to_delete:
-            del self[id_]
+        for _id in to_delete:
+            del self[_id]
 
     def delete_one(self, filter):
         """Delete one document that matches the filter.
@@ -1164,8 +1164,8 @@ class Collection:
 
         """
         to_delete = set(self._find(filter, limit=1))
-        for id_ in to_delete:
-            del self[id_]
+        for _id in to_delete:
+            del self[_id]
 
     def _dump(self, text_buffer):
         """Dump collection content serialized to JSON to text-buffer.
@@ -1514,11 +1514,11 @@ class Collection:
             help="Print results in indented format.",
         )
         args = parser.parse_args()
-        if args.id_ and args.indent:
+        if args._id and args.indent:
             raise ValueError("Select either `--id` or `--indent`, not both.")
         f = parse_filter_arg(args.filter)
         for doc in self.find(f, limit=args.limit):
-            if args.id_:
+            if args._id:
                 print(doc[self._primary_key])
             else:
                 if args.indent:
