@@ -11,7 +11,6 @@ import os
 import re
 import shutil
 import time
-import uuid
 import warnings
 from collections.abc import Iterable
 from contextlib import contextmanager
@@ -119,7 +118,11 @@ class Project:
 
         # Ensure that the project id is configured.
         try:
+<<<<<<< HEAD
             self.id_ = str(self.config["project"])
+=======
+            self._id = str(self.config["project"])
+>>>>>>> upstream/next
         except KeyError:
             raise LookupError(
                 "Unable to determine project id. "
@@ -261,7 +264,11 @@ class Project:
             The project id.
 
         """
+<<<<<<< HEAD
         return self.id_
+=======
+        return self._id
+>>>>>>> upstream/next
 
     def _check_schema_compatibility(self):
         """Check whether this project's data schema is compatible with this version.
@@ -830,7 +837,11 @@ class Project:
         """
         return self.find_jobs().to_dataframe(*args, **kwargs)
 
+<<<<<<< HEAD
     def _register(self, id_, statepoint):
+=======
+    def _register(self, _id, statepoint):
+>>>>>>> upstream/next
         """Register the job state point in the project state point cache.
 
         Parameters
@@ -1336,13 +1347,21 @@ class Project:
         Yields
         ------
         dict
+<<<<<<< HEAD
             Dictionary with keys ``id_`` containing the job id, ``sp``
+=======
+            Dictionary with keys ``_id`` containing the job id, ``sp``
+>>>>>>> upstream/next
             containing the state point, and ``doc`` containing the job document
             if requested.
 
         """
         for job_id in self._find_job_ids():
+<<<<<<< HEAD
             doc = dict(id_=job_id, sp=self._get_statepoint(job_id))
+=======
+            doc = dict(_id=job_id, sp=self._get_statepoint(job_id))
+>>>>>>> upstream/next
             if include_job_document:
                 try:
                     # Performance-critical path. We can rely on the project
@@ -1452,7 +1471,7 @@ class Project:
             return cache
 
     @contextmanager
-    def temporary_project(self, name=None, dir=None):
+    def temporary_project(self, dir=None):
         """Context manager for the initialization of a temporary project.
 
         The temporary project is by default created within the root project's
@@ -1468,9 +1487,6 @@ class Project:
 
         Parameters
         ----------
-        name : str
-            An optional name for the temporary project.
-            Defaults to a unique random string.
         dir : str
             Optionally specify where the temporary project root directory is to be
             created. Defaults to the project's workspace directory.
@@ -1481,17 +1497,15 @@ class Project:
             An instance of :class:`~signac.Project`.
 
         """
-        if name is None:
-            name = os.path.join(self.id, str(uuid.uuid4()))
         if dir is None:
             dir = self.workspace()
         _mkdir_p(self.workspace())  # ensure workspace exists
-        with TemporaryProject(name=name, cls=type(self), dir=dir) as tmp_project:
+        with TemporaryProject(cls=type(self), dir=dir) as tmp_project:
             yield tmp_project
 
     @classmethod
-    def init_project(cls, name, root=None, workspace=None, make_dir=True):
-        """Initialize a project with the given name.
+    def init_project(cls, *args, root=None, workspace=None, make_dir=True, **kwargs):
+        """Initialize a project in the provided root directory.
 
         It is safe to call this function multiple times with the same
         arguments. However, a `RuntimeError` is raised if an existing project
@@ -1502,8 +1516,6 @@ class Project:
 
         Parameters
         ----------
-        name : str
-            The name of the project to initialize.
         root : str
             The root directory for the project.
             Defaults to the current working directory.
@@ -1526,10 +1538,51 @@ class Project:
             configuration.
 
         """
+        # TODO: Remove both the `if args` and `if kwargs` blocks in version 3.0
+        # when we remove backwards compatibility for project name APIs.
+        name = None
+        # The key used to store project names in the project document.
+        name_key = "signac_project_name"
+        if args:
+            num_args = len(args)
+            if num_args == 1:
+                name = args[0]
+            else:
+                # Match the usual error from misusing keyword-only args.
+                raise TypeError(
+                    f"init_project() takes 0 positional arguments but {num_args} were given"
+                )
+        if kwargs:
+            name = kwargs.pop("name", None)
+            if kwargs:
+                # Match the usual error from extra keyword args.
+                raise TypeError(
+                    f"init_project() got an unexpected keyword argument '{next(iter(kwargs))}'"
+                )
+
+        if name is not None:
+            assert version.parse(__version__) < version.parse("3.0.0")
+            warnings.warn(
+                "Project names were removed in signac 2.0. If you intended to call "
+                "`init_project` with a root directory as the sole positional argument, please "
+                f"provide it as a keyword argument: `init_project(root={name})`. If your "
+                "project name contains important information, consider storing it in the "
+                "project document instead. The name provided will be stored in the project "
+                f"document with the key `{name_key}`. Calling `init_project` with a name will "
+                "become an error in signac 3.0.",
+                FutureWarning,
+            )
+
         if root is None:
             root = os.getcwd()
         try:
             project = cls.get_project(root=root, search=False)
+            existing_name = project.doc.get(name_key)
+            if name is not None and name != existing_name:
+                raise ValueError(
+                    "The name provided to `init_project` does not match the existing "
+                    f"project document in which {name_key}={existing_name}."
+                )
         except LookupError:
             fn_config = os.path.join(root, "signac.rc")
             if make_dir:
@@ -1541,18 +1594,24 @@ class Project:
             config["schema_version"] = SCHEMA_VERSION
             config.write()
             project = cls.get_project(root=root)
+            if name is not None:
+                project.doc[name_key] = name
             assert project.id == str(name)
             return project
         else:
+<<<<<<< HEAD
             if project.id != str(name) or (
                 workspace is not None
                 and os.path.realpath(workspace) != os.path.realpath(project.workspace())
             ):
+=======
+            if workspace is not None and os.path.realpath(
+                workspace
+            ) != os.path.realpath(project.workspace()):
+>>>>>>> upstream/next
                 raise RuntimeError(
-                    "Failed to initialize project '{}'. Path '{}' already "
-                    "contains a conflicting project configuration.".format(
-                        name, os.path.abspath(root)
-                    )
+                    f"Failed to initialize project. Path '{os.path.abspath(root)}' already "
+                    "contains a conflicting project configuration."
                 )
             return project
 
@@ -1657,7 +1716,7 @@ class Project:
 
 
 @contextmanager
-def TemporaryProject(name=None, cls=None, **kwargs):
+def TemporaryProject(cls=None, **kwargs):
     r"""Context manager for the generation of a temporary project.
 
     This is a factory function that creates a Project within a temporary directory
@@ -1670,9 +1729,6 @@ def TemporaryProject(name=None, cls=None, **kwargs):
 
     Parameters
     ----------
-    name : str
-        An optional name for the temporary project.
-        Defaults to a unique random string.
     cls :
         The class of the temporary project.
         Defaults to :class:`~signac.Project`.
@@ -1686,12 +1742,10 @@ def TemporaryProject(name=None, cls=None, **kwargs):
         An instance of :class:`~signac.Project`.
 
     """
-    if name is None:
-        name = str(uuid.uuid4())
     if cls is None:
         cls = Project
     with TemporaryDirectory(**kwargs) as tmp_dir:
-        yield cls.init_project(name=name, root=tmp_dir)
+        yield cls.init_project(root=tmp_dir)
 
 
 def _skip_errors(iterable, log=print):
@@ -2121,7 +2175,7 @@ class JobsCursor:
         return repr(self) + self._repr_html_jobs()
 
 
-def init_project(name, root=None, workspace=None, make_dir=True):
+def init_project(*args, root=None, workspace=None, make_dir=True, **kwargs):
     """Initialize a project with the given name.
 
     It is safe to call this function multiple times with the same arguments.
@@ -2130,8 +2184,6 @@ def init_project(name, root=None, workspace=None, make_dir=True):
 
     Parameters
     ----------
-    name : str
-        The name of the project to initialize.
     root : str
         The root directory for the project.
         Defaults to the current working directory.
@@ -2155,7 +2207,7 @@ def init_project(name, root=None, workspace=None, make_dir=True):
 
     """
     return Project.init_project(
-        name=name, root=root, workspace=workspace, make_dir=make_dir
+        *args, root=root, workspace=workspace, make_dir=make_dir, **kwargs
     )
 
 

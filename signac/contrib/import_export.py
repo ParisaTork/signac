@@ -62,7 +62,11 @@ def _make_schema_based_path_function(jobs, exclude_keys=None, delimiter_nested="
         # signature of the path function below.
         return lambda job, sep=None: ""
 
+<<<<<<< HEAD
     index = [{"id_": job.id, "sp": job.sp()} for job in jobs]
+=======
+    index = [{"_id": job.id, "sp": job.sp()} for job in jobs]
+>>>>>>> upstream/next
     statepoint_index = OrderedDict(
         _build_job_statepoint_index(exclude_const=True, index=index)
     )

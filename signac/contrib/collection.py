@@ -464,7 +464,11 @@ class Collection:
             self._next_default_id_ = len(self)
         for i in range(len(self) + 1):
             assert self._next_default_id_ < MAX_DEFAULT_ID
+<<<<<<< HEAD
             id_ = str(hex(self._next_default_id_))[2:].rjust(ID_LENGTH, "0")
+=======
+            _id = str(hex(self._next_default_id_))[2:].rjust(ID_LENGTH, "0")
+>>>>>>> upstream/next
             self._next_default_id_ += 1
             if id_ not in self:
                 return id_
