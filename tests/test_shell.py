@@ -790,8 +790,6 @@ class TestBasicShell:
             else:
                 os.remove(config.FN_CONFIG)
 
-<<<<<<< HEAD
-=======
     def test_config_verify(self):
         # no config file
         with pytest.raises(ExitCodeError):
@@ -806,7 +804,6 @@ class TestBasicShell:
         err = self.call("python -m signac config --local verify".split(), error=True)
         assert "Passed" in err
 
->>>>>>> upstream/next
     def test_update_cache(self):
         self.call("python -m signac init".split())
         project_a = signac.Project()
