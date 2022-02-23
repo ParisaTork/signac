@@ -668,7 +668,7 @@ class Project:
         index = self._build_index(include_job_document=False)
         if subset is not None:
             subset = {str(s) for s in subset}
-            index = [doc for doc in index if doc["id_"] in subset]
+            index = [doc for doc in index if doc["_id"] in subset]
         statepoint_index = _build_job_statepoint_index(
             exclude_const=exclude_const, index=index
         )

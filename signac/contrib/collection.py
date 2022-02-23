@@ -417,7 +417,7 @@ class Collection:
 
     """
 
-    def __init__(self, docs=None, primary_key="id_", compresslevel=0, _trust=False):
+    def __init__(self, docs=None, primary_key="_id", compresslevel=0, _trust=False):
         if isinstance(docs, str):
             raise ValueError(
                 "First argument cannot be of str type. "
@@ -1503,7 +1503,7 @@ class Collection:
         )
         parser.add_argument(
             "--id",
-            dest="id_",
+            dest="_id",
             action="store_true",
             help="Print a document's primary key instead of the whole document.",
         )

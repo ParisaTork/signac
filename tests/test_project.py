@@ -696,7 +696,7 @@ class TestProject(TestProjectBase):
         job_ids = {job.id for job in self.project.find_jobs()}
         docs = list(self.project._build_index())
 <<<<<<< HEAD
-        job_ids_cmp = {doc["id_"] for doc in docs}
+        job_ids_cmp = {doc["_id"] for doc in docs}
 =======
         job_ids_cmp = {doc["_id"] for doc in docs}
 >>>>>>> upstream/next
