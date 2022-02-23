@@ -118,11 +118,7 @@ class Project:
 
         # Ensure that the project id is configured.
         try:
-<<<<<<< HEAD
-            self.id_ = str(self.config["project"])
-=======
             self._id = str(self.config["project"])
->>>>>>> upstream/next
         except KeyError:
             raise LookupError(
                 "Unable to determine project id. "
@@ -264,11 +260,7 @@ class Project:
             The project id.
 
         """
-<<<<<<< HEAD
-        return self.id_
-=======
         return self._id
->>>>>>> upstream/next
 
     def _check_schema_compatibility(self):
         """Check whether this project's data schema is compatible with this version.
@@ -837,11 +829,7 @@ class Project:
         """
         return self.find_jobs().to_dataframe(*args, **kwargs)
 
-<<<<<<< HEAD
-    def _register(self, id_, statepoint):
-=======
     def _register(self, _id, statepoint):
->>>>>>> upstream/next
         """Register the job state point in the project state point cache.
 
         Parameters
@@ -1347,21 +1335,13 @@ class Project:
         Yields
         ------
         dict
-<<<<<<< HEAD
-            Dictionary with keys ``id_`` containing the job id, ``sp``
-=======
             Dictionary with keys ``_id`` containing the job id, ``sp``
->>>>>>> upstream/next
             containing the state point, and ``doc`` containing the job document
             if requested.
 
         """
         for job_id in self._find_job_ids():
-<<<<<<< HEAD
-            doc = dict(id_=job_id, sp=self._get_statepoint(job_id))
-=======
             doc = dict(_id=job_id, sp=self._get_statepoint(job_id))
->>>>>>> upstream/next
             if include_job_document:
                 try:
                     # Performance-critical path. We can rely on the project
@@ -1599,16 +1579,9 @@ class Project:
             assert project.id == str(name)
             return project
         else:
-<<<<<<< HEAD
-            if project.id != str(name) or (
-                workspace is not None
-                and os.path.realpath(workspace) != os.path.realpath(project.workspace())
-            ):
-=======
             if workspace is not None and os.path.realpath(
                 workspace
             ) != os.path.realpath(project.workspace()):
->>>>>>> upstream/next
                 raise RuntimeError(
                     f"Failed to initialize project. Path '{os.path.abspath(root)}' already "
                     "contains a conflicting project configuration."
