@@ -667,8 +667,8 @@ class TestProject(TestProjectBase):
         for sp in statepoints:
             self.project.open_job(sp).document["test"] = True
         job_ids = {job.id for job in self.project.find_jobs()}
-        docs = list(self.project._build_index())
-        job_ids_cmp = {doc["_id"] for doc in docs}
+        docs = dict(self.project._build_index())
+        job_ids_cmp = docs.keys()
         assert job_ids == job_ids_cmp
         assert len(docs) == len(statepoints)
 
@@ -679,21 +679,6 @@ class TestProject(TestProjectBase):
         project = CustomProject.get_project(root=self.project.root_directory())
         assert isinstance(project, signac.Project)
         assert isinstance(project, CustomProject)
-
-    def test_custom_job_class(self):
-        class CustomJob(signac.contrib.job.Job):
-            def __init__(self, *args, **kwargs):
-                super().__init__(*args, **kwargs)
-
-        class CustomProject(signac.Project):
-            Job = CustomJob
-
-        project = CustomProject.get_project(root=self.project.root_directory())
-        assert isinstance(project, signac.Project)
-        assert isinstance(project, CustomProject)
-        job = project.open_job(dict(a=0))
-        assert isinstance(job, CustomJob)
-        assert isinstance(job, signac.contrib.job.Job)
 
     def test_project_contains(self):
         job = self.open_job(dict(a=0))
@@ -2242,6 +2227,8 @@ class TestLinkedViewProject(TestProjectBase):
 
 
 class UpdateCacheAfterInitJob(signac.contrib.job.Job):
+    """Test job class that updates the project cache on job init."""
+
     def init(self, *args, **kwargs):
         job = super().init(*args, **kwargs)
         self._project.update_cache()
@@ -2249,8 +2236,14 @@ class UpdateCacheAfterInitJob(signac.contrib.job.Job):
 
 
 class UpdateCacheAfterInitJobProject(signac.Project):
-    "This is a test class that regularly calls the update_cache() method."
-    Job = UpdateCacheAfterInitJob
+    """Test project class that updates the project cache on job init."""
+
+    def open_job(self, *args, **kwargs):
+        job = super().open_job(*args, **kwargs)
+        cache_updating_job = UpdateCacheAfterInitJob(
+            job._project, job.statepoint(), job._id
+        )
+        return cache_updating_job
 
 
 class TestCachedProject(TestProject):

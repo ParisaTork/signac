@@ -26,7 +26,7 @@ from ..core.h5store import H5StoreManager
 from ..sync import sync_projects
 from ..synced_collections.backends.collection_json import BufferedJSONAttrDict
 from ..version import SCHEMA_VERSION, __version__
-from .collection import Collection
+from ._searchindexer import _SearchIndexer
 from .errors import (
     DestinationExistsError,
     IncompatibleSchemaVersion,
@@ -96,8 +96,6 @@ class Project:
         working directory (Default value = None).
 
     """
-
-    Job = Job
 
     FN_DOCUMENT = "signac_project_document.json"
     "The project's document filename."
@@ -530,10 +528,14 @@ class Project:
             raise ValueError("Either statepoint or id must be provided, but not both.")
         if id is None:
             # Second best case (Job will update self._sp_cache on init)
-            return self.Job(project=self, statepoint=statepoint)
+            return Job(project=self, statepoint=statepoint)
         try:
             # Optimal case (id is in the state point cache)
+<<<<<<< HEAD
             return self.Job(project=self, statepoint=self._sp_cache[id], id_=id)
+=======
+            return Job(project=self, statepoint=self._sp_cache[id], _id=id)
+>>>>>>> c2a481ef5f144bad27b2a856c267a63294bff99b
         except KeyError:
             # Worst case: no state point was provided and the state point cache
             # missed. The Job will register itself in self._sp_cache when the
@@ -552,7 +554,11 @@ class Project:
             elif not self._contains_job_id(id):
                 # id does not exist in the project data space
                 raise KeyError(id)
+<<<<<<< HEAD
             return self.Job(project=self, id_=id)
+=======
+            return Job(project=self, _id=id)
+>>>>>>> c2a481ef5f144bad27b2a856c267a63294bff99b
 
     def _job_dirs(self):
         """Generate ids of jobs in the workspace.
@@ -665,10 +671,10 @@ class Project:
         """
         from .schema import _build_job_statepoint_index
 
-        index = self._build_index(include_job_document=False)
+        index = _SearchIndexer(self._build_index(include_job_document=False))
         if subset is not None:
-            subset = {str(s) for s in subset}
-            index = [doc for doc in index if doc["_id"] in subset]
+            subset = {str(s) for s in subset}.intersection(index.keys())
+            index = _SearchIndexer((_id, index[_id]) for _id in subset)
         statepoint_index = _build_job_statepoint_index(
             exclude_const=exclude_const, index=index
         )
@@ -705,10 +711,10 @@ class Project:
         if not filter:
             return list(self._job_dirs())
         filter = dict(parse_filter(_add_prefix("sp.", filter)))
-        index = list(
+        index = _SearchIndexer(
             self._build_index(include_job_document="doc" in _root_keys(filter))
         )
-        return list(Collection(index, _trust=True)._find(filter))
+        return list(index.find(filter))
 
     def find_jobs(self, filter=None, *args, **kwargs):
         """Find all jobs in the project's workspace.
@@ -854,7 +860,7 @@ class Project:
         # Performance-critical path. We can rely on the project workspace, job
         # id, and state point file name to be well-formed, so just use str.join
         # with os.sep instead of os.path.join for speed.
-        fn_statepoint = os.sep.join((self.workspace(), job_id, self.Job.FN_STATE_POINT))
+        fn_statepoint = os.sep.join((self.workspace(), job_id, Job.FN_STATE_POINT))
         try:
             with open(fn_statepoint, "rb") as statepoint_file:
                 return json.loads(statepoint_file.read().decode())
@@ -1334,14 +1340,15 @@ class Project:
 
         Yields
         ------
-        dict
-            Dictionary with keys ``_id`` containing the job id, ``sp``
-            containing the state point, and ``doc`` containing the job document
-            if requested.
+        job_id : str
+            The job id.
+        doc : dict
+            Dictionary with keys ``sp`` containing the state point and ``doc``
+            containing the job document if requested.
 
         """
         for job_id in self._find_job_ids():
-            doc = dict(_id=job_id, sp=self._get_statepoint(job_id))
+            doc = {"sp": self._get_statepoint(job_id)}
             if include_job_document:
                 try:
                     # Performance-critical path. We can rely on the project
@@ -1349,14 +1356,14 @@ class Project:
                     # well-formed, so just use str.join with os.sep instead of
                     # os.path.join for speed.
                     fn_document = os.sep.join(
-                        (self.workspace(), job_id, self.Job.FN_DOCUMENT)
+                        (self.workspace(), job_id, Job.FN_DOCUMENT)
                     )
                     with open(fn_document, "rb") as file:
                         doc["doc"] = json.loads(file.read().decode())
                 except OSError as error:
                     if error.errno != errno.ENOENT:
                         raise
-            yield doc
+            yield job_id, doc
 
     def _update_in_memory_cache(self):
         """Update the in-memory state point cache to reflect the workspace."""
