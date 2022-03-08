@@ -531,11 +531,7 @@ class Project:
             return Job(project=self, statepoint=statepoint)
         try:
             # Optimal case (id is in the state point cache)
-<<<<<<< HEAD
-            return self.Job(project=self, statepoint=self._sp_cache[id], id_=id)
-=======
             return Job(project=self, statepoint=self._sp_cache[id], _id=id)
->>>>>>> c2a481ef5f144bad27b2a856c267a63294bff99b
         except KeyError:
             # Worst case: no state point was provided and the state point cache
             # missed. The Job will register itself in self._sp_cache when the
@@ -554,11 +550,7 @@ class Project:
             elif not self._contains_job_id(id):
                 # id does not exist in the project data space
                 raise KeyError(id)
-<<<<<<< HEAD
-            return self.Job(project=self, id_=id)
-=======
             return Job(project=self, _id=id)
->>>>>>> c2a481ef5f144bad27b2a856c267a63294bff99b
 
     def _job_dirs(self):
         """Generate ids of jobs in the workspace.
