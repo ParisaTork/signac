@@ -1,3 +1,9 @@
+# OSS Contribution (Parisa)
+
+* Issue: [https://github.com/glotzerlab/signac/issues/679](https://github.com/glotzerlab/signac/issues/679)
+* PR: [https://github.com/glotzerlab/signac/pull/681](https://github.com/glotzerlab/signac/pull/681)
+* Final PR: [https://github.com/glotzerlab/signac/pull/717](https://github.com/glotzerlab/signac/pull/717)
+
 # <img src="https://raw.githubusercontent.com/glotzerlab/signac/master/doc/images/palette-header.png" width="75" height="58"> signac - simple data management
 
 [![Affiliated with NumFOCUS](https://img.shields.io/badge/NumFOCUS-affiliated%20project-orange.svg?style=flat&colorA=E1523D&colorB=007D8A)](https://numfocus.org/sponsored-projects/affiliated-projects)
