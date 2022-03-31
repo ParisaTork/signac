@@ -5,7 +5,10 @@
 
 import logging
 
+<<<<<<< HEAD
 from .collection import Collection
+=======
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
 from .project import Project, TemporaryProject, get_job, get_project, init_project
 
 logger = logging.getLogger(__name__)
@@ -17,5 +20,8 @@ __all__ = [
     "get_project",
     "init_project",
     "get_job",
+<<<<<<< HEAD
     "Collection",
+=======
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
 ]

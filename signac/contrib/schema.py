@@ -9,7 +9,11 @@ from collections.abc import Mapping
 from numbers import Number
 from pprint import pformat
 
+<<<<<<< HEAD
 from .collection import _DictPlaceholder
+=======
+from ._searchindexer import _DictPlaceholder
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
 from .utility import _nested_dicts_to_dotted_keys
 
 

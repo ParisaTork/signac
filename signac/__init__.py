@@ -10,6 +10,7 @@ collectively accessible.
 """
 
 from . import contrib, errors, sync, testing, warnings
+<<<<<<< HEAD
 from .contrib import (
     Collection,
     Project,
@@ -18,6 +19,9 @@ from .contrib import (
     get_project,
     init_project,
 )
+=======
+from .contrib import Project, TemporaryProject, get_job, get_project, init_project
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
 from .core.h5store import H5Store, H5StoreManager
 from .diff import diff_jobs
 from .synced_collections.backends.collection_json import (
@@ -44,7 +48,10 @@ __all__ = [
     "init_project",
     "get_job",
     "diff_jobs",
+<<<<<<< HEAD
     "Collection",
+=======
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
     "buffered",
     "is_buffered",
     "get_buffer_capacity",

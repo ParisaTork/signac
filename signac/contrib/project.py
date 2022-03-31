@@ -57,6 +57,12 @@ DOC_FILTER_WARNING = (
     "information."
 )
 
+<<<<<<< HEAD
+=======
+# Temporary default for project names until they are removed entirely in signac 2.0
+_DEFAULT_PROJECT_NAME = None
+
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
 
 class _ProjectConfig(Config):
     r"""Extends the project config to make it immutable.
@@ -531,7 +537,11 @@ class Project:
             return Job(project=self, statepoint=statepoint)
         try:
             # Optimal case (id is in the state point cache)
+<<<<<<< HEAD
             return Job(project=self, statepoint=self._sp_cache[id], _id=id)
+=======
+            return Job(project=self, statepoint=self._sp_cache[id], id_=id)
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
         except KeyError:
             # Worst case: no state point was provided and the state point cache
             # missed. The Job will register itself in self._sp_cache when the
@@ -550,7 +560,11 @@ class Project:
             elif not self._contains_job_id(id):
                 # id does not exist in the project data space
                 raise KeyError(id)
+<<<<<<< HEAD
             return Job(project=self, _id=id)
+=======
+            return Job(project=self, id_=id)
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
 
     def _job_dirs(self):
         """Generate ids of jobs in the workspace.
@@ -666,7 +680,11 @@ class Project:
         index = _SearchIndexer(self._build_index(include_job_document=False))
         if subset is not None:
             subset = {str(s) for s in subset}.intersection(index.keys())
+<<<<<<< HEAD
             index = _SearchIndexer((_id, index[_id]) for _id in subset)
+=======
+            index = _SearchIndexer((id_, index[id_]) for id_ in subset)
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
         statepoint_index = _build_job_statepoint_index(
             exclude_const=exclude_const, index=index
         )
@@ -743,7 +761,7 @@ class Project:
             raise TypeError("Unsupported arguments were provided.")
         filter = dict(parse_filter(_add_prefix("sp.", filter)))
         if doc_filter:
-            warnings.warn(DOC_FILTER_WARNING, DeprecationWarning)
+            warnings.warn(DOC_FILTER_WARNING, FutureWarning)
             filter.update(parse_filter(_add_prefix("doc.", doc_filter)))
         return JobsCursor(self, filter)
 
@@ -1495,13 +1513,17 @@ class Project:
 
         Parameters
         ----------
+<<<<<<< HEAD
         root : str
+=======
+        root : str, optional
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
             The root directory for the project.
             Defaults to the current working directory.
-        workspace : str
+        workspace : str, optional
             The workspace directory for the project.
             Defaults to a subdirectory ``workspace`` in the project root.
-        make_dir : bool
+        make_dir : bool, optional
             Create the project root directory if it does not exist yet
             (Default value = True).
 
@@ -1554,6 +1576,16 @@ class Project:
 
         if root is None:
             root = os.getcwd()
+
+        if name is not None:
+            warnings.warn(
+                "Project names are deprecated and will be removed in signac 2.0 in favor of using "
+                "the project root directory to identify projects. The name argument to "
+                "init_project should be removed.",
+                FutureWarning,
+            )
+        else:
+            name = _DEFAULT_PROJECT_NAME
         try:
             project = cls.get_project(root=root, search=False)
             existing_name = project.doc.get(name_key)
@@ -2148,7 +2180,11 @@ class JobsCursor:
 
 
 def init_project(*args, root=None, workspace=None, make_dir=True, **kwargs):
+<<<<<<< HEAD
     """Initialize a project with the given name.
+=======
+    """Initialize a project.
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
 
     It is safe to call this function multiple times with the same arguments.
     However, a `RuntimeError` is raised if an existing project configuration
@@ -2156,13 +2192,17 @@ def init_project(*args, root=None, workspace=None, make_dir=True, **kwargs):
 
     Parameters
     ----------
+<<<<<<< HEAD
     root : str
+=======
+    root : str, optional
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
         The root directory for the project.
         Defaults to the current working directory.
-    workspace : str
+    workspace : str, optional
         The workspace directory for the project.
         Defaults to a subdirectory ``workspace`` in the project root.
-    make_dir : bool
+    make_dir : bool, optional
         Create the project root directory, if it does not exist yet (Default
         value = True).
 

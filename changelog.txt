@@ -21,6 +21,10 @@ Removed
 
  - The ``Project.config`` property is no longer mutable. Use the command line ``$ signac config`` to modify configuration (#608, #246, #244).
  - ``Project`` subclasses can no longer define a ``Job`` subclass to use (#588, #693).
+<<<<<<< HEAD
+=======
+ - The ``Collection`` class has been removed (#664, #667, #683).
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
 
 Version 1
 =========
@@ -33,11 +37,13 @@ Added
 
  - Official support for Python 3.10 (#631).
  - Benchmarks can be run using the ``asv`` (airspeed velocity) tool (#629).
+ - Continuous integration tests run in parallel with ``pytest-xdist`` (#705).
 
 Changed
 +++++++
 
  - Schema migration is now performed on directories rather than signac projects and supports a wider range of schemas (#654).
+ - Deprecated features now use ``FutureWarning`` instead of ``DeprecationWarning``, which is hidden by default (#687, #691).
 
 Deprecated
 ++++++++++
@@ -48,6 +54,11 @@ Deprecated
  - ``index`` argument is deprecated in ``Project`` methods (#602, #588).
  - ``signac.cite`` module is deprecated (#611, #592).
  - ``config.get_config`` method is deprecated (#675).
+
+Changed
++++++++
+
+ - Project names have a default in anticipation of removing names entirely. Project names will be removed in signac 2.0.
 
 Fixed
 +++++

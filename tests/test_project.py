@@ -292,6 +292,7 @@ class TestProject(TestProjectBase):
         assert 0 == len(list(self.project.find_jobs(filter={"a": 5}, doc_filter=None)))
         assert 1 == len(list(self.project.find_jobs({"sp.a": 0})))
         assert 0 == len(list(self.project.find_jobs({"sp.a": 5})))
+<<<<<<< HEAD
         with pytest.deprecated_call():
             assert 1 == len(list(self.project.find_jobs(doc_filter={"b": 0})))
         with pytest.deprecated_call():
@@ -311,10 +312,32 @@ class TestProject(TestProjectBase):
         with pytest.deprecated_call():
             assert 1 == len(list(self.project.find_jobs(None, {"b": 0})))
         with pytest.deprecated_call():
+=======
+        with pytest.warns(FutureWarning):
+            assert 1 == len(list(self.project.find_jobs(doc_filter={"b": 0})))
+        with pytest.warns(FutureWarning):
+            assert 0 == len(list(self.project.find_jobs(doc_filter={"b": 5})))
+        with pytest.warns(FutureWarning):
+            assert 1 == len(list(self.project.find_jobs(None, doc_filter={"b": 0})))
+        with pytest.warns(FutureWarning):
+            assert 0 == len(list(self.project.find_jobs(None, doc_filter={"b": 5})))
+        with pytest.warns(FutureWarning):
+            assert 1 == len(
+                list(self.project.find_jobs(filter=None, doc_filter={"b": 0}))
+            )
+        with pytest.warns(FutureWarning):
+            assert 0 == len(
+                list(self.project.find_jobs(filter=None, doc_filter={"b": 5}))
+            )
+        with pytest.warns(FutureWarning):
+            assert 1 == len(list(self.project.find_jobs(None, {"b": 0})))
+        with pytest.warns(FutureWarning):
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
             assert 0 == len(list(self.project.find_jobs(None, {"b": 5})))
         assert 1 == len(list(self.project.find_jobs({"doc.b": 0})))
         assert 0 == len(list(self.project.find_jobs({"doc.b": 5})))
         assert 1 == len(list(self.project.find_jobs({"a": 0, "doc.b": 0})))
+<<<<<<< HEAD
         with pytest.deprecated_call():
             assert 1 == len(list(self.project.find_jobs({"a": 0}, {"b": 0})))
         with pytest.deprecated_call():
@@ -332,6 +355,25 @@ class TestProject(TestProjectBase):
                 list(self.project.find_jobs(filter={"a": 0}, doc_filter={"b": 5}))
             )
         with pytest.deprecated_call():
+=======
+        with pytest.warns(FutureWarning):
+            assert 1 == len(list(self.project.find_jobs({"a": 0}, {"b": 0})))
+        with pytest.warns(FutureWarning):
+            assert 1 == len(
+                list(self.project.find_jobs(filter={"a": 0}, doc_filter={"b": 0}))
+            )
+        with pytest.warns(FutureWarning):
+            assert 1 == len(list(self.project.find_jobs({"a": 0}, doc_filter={"b": 0})))
+        assert 1 == len(list(self.project.find_jobs({"sp.a": 0, "doc.b": 0})))
+        assert 0 == len(list(self.project.find_jobs({"a": 0, "doc.b": 5})))
+        with pytest.warns(FutureWarning):
+            assert 0 == len(list(self.project.find_jobs({"a": 0}, {"b": 5})))
+        with pytest.warns(FutureWarning):
+            assert 0 == len(
+                list(self.project.find_jobs(filter={"a": 0}, doc_filter={"b": 5}))
+            )
+        with pytest.warns(FutureWarning):
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
             assert 0 == len(list(self.project.find_jobs({"a": 0}, doc_filter={"b": 5})))
         assert 0 == len(list(self.project.find_jobs({"sp.a": 0, "doc.b": 5})))
         assert 0 == len(list(self.project.find_jobs({"sp.a": 5, "doc.b": 0})))
@@ -362,7 +404,11 @@ class TestProject(TestProjectBase):
         for sp in statepoints:
             assert self.project.open_job(sp) in cursor_doc
 
+<<<<<<< HEAD
         with pytest.deprecated_call():
+=======
+        with pytest.warns(FutureWarning):
+>>>>>>> 977c9e3bb7a68bd9588416d680c4c18d89b1c286
             cursor_doc = self.project.find_jobs(doc_filter={"test": True})
             for sp in statepoints:
                 assert self.project.open_job(sp) in cursor_doc
